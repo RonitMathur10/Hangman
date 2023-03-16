@@ -1,0 +1,148 @@
+#Name of the Program is "Guess the Word". One or two players can play it.
+import random
+import os
+def clear_console():
+  os.system('clear')
+
+
+def wordToGuess(players, count):
+  if players == 1:
+    print ("\n")
+    with open("wordslist.txt", "r") as file:
+      allText = file.read()
+      words = list(map(str, allText.split()))
+    print ("You have chosen the one player mode! The computer will randomly select a word which you will have to guess.")
+    print ("\n")
+    ready = input("Are you ready?! (Y or N)  ").upper()
+    if ready == "Y":
+      return (random.choice(words).upper())
+  elif players == 2:
+    print ("\n")
+    print ("You have chosen the two player mode! One person needs to input a word for the other player to guess! OTHER ONE LOOK AWAY! Get Ready!")
+    print ("\n")
+    return input("  Choose a word: ").upper()
+  else:
+    print ("Invalid player count")
+    count += 1
+    while players != 1 and players != 2:
+      if count ==  4:
+        print ("\n")
+        print ("Too many invalid inputs")
+        print ("Exiting the game")
+        exit()
+      players = int(input("How many people are playing? (1 or 2): "))
+      return wordToGuess(players, count)
+
+def guessTheWord():
+  print ("Hello! Welcome to Guess the Word!. You play by guessing letters in a hidden word to guess the word. Each correct guess results in that letter being uncovered in the corressponding part of the word.")
+  print ("\n")
+  players = int(input("How many people are playing? (1 or 2): "))
+  if players == 1:
+    word = wordToGuess(1, 0)
+  if players == 2:
+    word = wordToGuess(2, 0)
+  elif players != 1 and players != 2:
+    print ("Invalid player count")
+    word = wordToGuess(int(input("How many people are playing? (1 or 2): ")), 0)
+  
+  clear_console()
+  list_word = list("_" * len(word))  
+  displayed_word = ""
+  guessed = False
+  Index_of_Guess = []
+  guessed_letters = []
+  guessed_words = []
+  tries = 0
+  alphabets = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+  while guessed == False and tries < 6:
+
+    print ("Already guessed letters: " , guessed_letters)
+    print ("Already guessed words: " , guessed_words)
+      
+    print ("You have %s incorrect attempts left." % (6 - tries) + (" The length of the word is %s characters long") % len(word))
+    
+    list_word_str = ""
+    for char in list_word:
+      list_word_str = list_word_str + char
+    print (list_word_str)
+    
+    guess = str(input("What is your guess?: ")).upper()
+    #Asking player for their guess
+    
+    if len(guess) == 1 and guess not in alphabets:
+      print ("Invalid Guess")
+    elif len(guess) == 1 and guess in alphabets:
+      if guess in word and guess not in guessed_letters:
+        print ("\n")
+        print ("Correct!")
+        for i in range(len(word)):
+          if word[i] == guess:
+            Index_of_Guess.append(i)   
+            #Appending the index of the word where the guess is correct
+        for k in Index_of_Guess:
+          list_word[k] = guess
+        displayed_word = ""
+        for z in list_word:
+          displayed_word = displayed_word + z
+        print (displayed_word)
+        print ("\n")
+      elif guess in guessed_letters:
+        print ("\n")
+        print ("You have already tried " + guess)
+        print ("Please try again")
+        print ("\n")
+        print (displayed_word)
+      elif guess not in word and guess not in guessed_letters:
+        print ("\n")
+        print (guess + " is not in the word")
+        print ("Please try again")
+        print ("\n")
+        print (displayed_word)
+        tries += 1
+    Index_of_Guess.clear()
+    #print (displayed_word)
+    
+    if len(guess) == len(word):
+      for char in guess:
+        if char not in alphabets:
+          print ("Invalid Guess")
+          break
+      else:
+        if guess == word:
+          print (word)
+          guessed = True
+        if guess != word and guess not in guessed_words:
+          print ("Incorrect!")
+          print ("\n")
+          tries += 1
+        if guess in guessed_words:
+          print ("You have already tried this. Please try again!")
+    elif len(guess) != 1 and len(guess) != len(word):
+      print ("\n")
+      print ("Your guess is invalid because of its length. Please try again.")
+      print ("\n")
+
+    if len(guess) == 1 and guess not in guessed_letters:
+      guessed_letters.append(guess)
+    if len(guess) == len(word) and guess not in guessed_words:
+      guessed_words.append(guess)
+
+    
+    if displayed_word == word:
+      guessed = True
+  if guessed == True:
+    print ("Congratulations! You have won the game.")
+    print ("\n")
+    print ("The word was: " + word)
+  if tries == 6:
+    print ("You have lost the game!")
+    print ("\n")
+    print ("The word was:" + word)
+play = True
+while play == True:
+  guessTheWord()
+  askagain = input("Do you want to play again? (Y or N):  ").upper()
+  clear_console()
+  if askagain == "N":
+    play = False
+    print ("Thanks for playing!")
